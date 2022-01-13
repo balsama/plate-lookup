@@ -5,15 +5,12 @@ include_once('vendor/autoload.php');
 use Balsama\BostonPlateLookup\Lookup;
 use Balsama\BostonPlateLookup\Helpers;
 
-if (!is_string($_POST['plate_number'])) {
+$plateNumber = $argv[1];
+if (!is_string($plateNumber)) {
     throw new Exception('You must provide a plate number as an argument to this script');
 }
-$plateNumber = strtolower(trim($_POST['plate_number']));
-if (strlen($plateNumber) > 10) {
-    throw new Exception('Plate number cannot be longer than ten characters');
-}
 
-$database = Helpers::initializeDatabase();
+$database = \Balsama\BostonPlateLookup\Helpers::initializeDatabase();
 
 $existingRecord = $database->select('lookup', ['plate_number', 'fetched_timestamp'], [
     'plate_number' => $plateNumber,
@@ -24,8 +21,7 @@ $existingRecord = $database->select('lookup', ['plate_number', 'fetched_timestam
 if (!$existingRecord) {
     $lookup = new Lookup($plateNumber);
     $lookup->saveToDb();
-}
-else {
+} else {
     $existingRecordTimestamp = reset($existingRecord)['fetched_timestamp'];
     if ((time() - $existingRecordTimestamp) > 86400) {
 
@@ -37,8 +33,7 @@ else {
 
         if (!$existingRecordBirthday) {
             $lookup = new Lookup($plateNumber);
-        }
-        else {
+        } else {
             $existingRecordBirthday = reset($existingRecordBirthday);
             $yearDay = Helpers::getYearDayFromMonthAndMonthday(
                 $existingRecordBirthday['birth_month'],
@@ -56,27 +51,17 @@ $record = $database->select('lookup', '*', [
     'LIMIT' => 1,
 ]);
 $record = reset($record);
-
 $tickets = $database->select('tickets', '*', [
     'plate_number' => $plateNumber,
 ]);
 
-$message = '';
-if ($record['found']) {
-    $format = "Plate \"%s\" has a current balance of $%4.2f.\n";
-    $message = sprintf($format, strtoupper($plateNumber), $record['balance']);
-}
-else {
-    $format = "Unable to find plate \"%s\" in the system.\n";
-    $message = sprintf($format, strtoupper($plateNumber));
-}
+$format = "Plate %s has a current balance of $%4.2f.\n";
+print sprintf($format, $plateNumber, $record['balance']);
 if ($tickets) {
-    $message .= "\n" . count($tickets) . " total Tickets found:\n";
+    print "Tickets:\n";
     foreach ($tickets as $ticket) {
         /* @var \Balsama\BostonPlateLookup\Ticket $ticket */
-        $format = "• %s: $%4.2f - issued %s %s at %s.\n";
-        $message .= sprintf($format, $ticket['infraction'], $ticket['fine'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
+        $format = "%s issued %s %s at %s.\n";
+        print sprintf($format, $ticket['infraction'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
     }
 }
-
-print $message;
