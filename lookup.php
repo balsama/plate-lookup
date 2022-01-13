@@ -5,6 +5,10 @@ include_once('vendor/autoload.php');
 use Balsama\BostonPlateLookup\Lookup;
 use Balsama\BostonPlateLookup\Helpers;
 
+if (!$_POST) {
+    echo '200 ok<p>POST a <code>plate_number</code> value to look up tickets.</p>';
+    exit;
+}
 if (!is_string($_POST['plate_number'])) {
     throw new Exception('You must provide a plate number as an argument to this script');
 }

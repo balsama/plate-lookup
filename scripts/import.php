@@ -16,6 +16,7 @@ foreach ($csv as $line) {
 
 array_shift($data);
 
+$i = 0;
 foreach ($data as $rawTicket) {
     $ticket = new Ticket(
         strtolower($rawTicket[12]),
@@ -28,6 +29,10 @@ foreach ($data as $rawTicket) {
     );
 
     SaveToDb::insertTicket($ticket);
-}
+    $i++;
+    if ($i % 1000) {
+        print "Imported $i records ...\n";
+    }
 
-$foo = 21;
+    print "Imported all $i records. \n";
+}
