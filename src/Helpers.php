@@ -8,7 +8,7 @@ class Helpers
 {
     public static function initializeDatabase(): Medoo
     {
-        if (getenv('LOOKUPENV' === 'dioc')) {
+        if (getenv('LOOKUPENV') === 'dioc') {
             $database = new Medoo([
                 'type' => 'PostgreSQL',
                 'host' => 'app-42d2b891-6867-4baa-98c5-c4ba9a24675f-do-user-2963441-0.b.db.ondigitalocean.com',
