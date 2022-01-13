@@ -11,47 +11,11 @@ class Helpers
         if (getenv('LOOKUPENV') === 'dioc') {
             $database = new Medoo([
                 'type' => 'pgsql',
-                'host' => 'app-42d2b891-6867-4baa-98c5-c4ba9a24675f-do-user-2963441-0.b.db.ondigitalocean.com',
-                'port' => 25060,
-                'database' => 'lookups',
-                'username' => 'lookups',
+                'host' => getenv('DIOC_PG_HOST'),
+                'port' => getenv('DIOC_PG_port'),
+                'database' => getenv('DIOC_PG_DB_NAME'),
+                'username' => getenv('DIOC_PG_DB_USERNAME'),
                 'password' => getenv('DIOC_PG_PW'),
-            ]);
-
-            $database->create('lookup', [
-                'id' => [
-                    'SERIAL',
-                    'PRIMARY KEY'
-                ],
-                'plate_number' => ['TEXT'],
-                'found' => ['INTEGER'],
-                'balance' => ['FLOAT'],
-                'full_response' => ['TEXT'],
-                'fetched_timestamp' => ['INTEGER'],
-            ]);
-
-            $database->create('tickets', [
-                'id' => [
-                    'SERIAL',
-                    'PRIMARY KEY',
-                ],
-                'ticket_number' => ['TEXT', 'UNIQUE'],
-                'plate_number' => ['TEXT'],
-                'infraction' => ['TEXT'],
-                'fine' => ['FLOAT'],
-                'infraction_date' => ['TEXT'],
-                'infraction_time' => ['TEXT'],
-                'infraction_address' => ['TEXT'],
-            ]);
-
-            $database->create('birthdays', [
-                'id' => [
-                    'SERIAL',
-                    'PRIMARY KEY'
-                ],
-                'plate_number' => ['TEXT'],
-                'birth_month' => ['INTEGER'],
-                'birth_monthday' => ['INTEGER'],
             ]);
         }
         else {
@@ -59,43 +23,31 @@ class Helpers
                 'type' => 'sqlite',
                 'database' => 'lookups.db'
             ]);
-
-            $database->create('lookup', [
-                'id' => [
-                    'INTEGER',
-                    'PRIMARY KEY'
-                ],
-                'plate_number' => ['TEXT'],
-                'found' => ['INTEGER'],
-                'balance' => ['FLOAT'],
-                'full_response' => ['TEXT'],
-                'fetched_timestamp' => ['INTEGER'],
-            ]);
-
-            $database->create('tickets', [
-                'id' => [
-                    'INTEGER',
-                    'PRIMARY KEY',
-                ],
-                'ticket_number' => ['TEXT', 'UNIQUE'],
-                'plate_number' => ['TEXT'],
-                'infraction' => ['TEXT'],
-                'fine' => ['FLOAT'],
-                'infraction_date' => ['TEXT'],
-                'infraction_time' => ['TEXT'],
-                'infraction_address' => ['TEXT'],
-            ]);
-
-            $database->create('birthdays', [
-                'id' => [
-                    'INTEGER',
-                    'PRIMARY KEY'
-                ],
-                'plate_number' => ['TEXT'],
-                'birth_month' => ['INTEGER'],
-                'birth_monthday' => ['INTEGER'],
-            ]);
         }
+
+        $database->create('lookup', [
+            'plate_number' => ['TEXT'],
+            'found' => ['INTEGER'],
+            'balance' => ['FLOAT'],
+            'full_response' => ['TEXT'],
+            'fetched_timestamp' => ['INTEGER'],
+        ]);
+
+        $database->create('tickets', [
+            'ticket_number' => ['TEXT'],
+            'plate_number' => ['TEXT'],
+            'infraction' => ['TEXT'],
+            'fine' => ['FLOAT'],
+            'infraction_date' => ['TEXT'],
+            'infraction_time' => ['TEXT'],
+            'infraction_address' => ['TEXT'],
+        ]);
+
+        $database->create('birthdays', [
+            'plate_number' => ['TEXT'],
+            'birth_month' => ['INTEGER'],
+            'birth_monthday' => ['INTEGER'],
+        ]);
 
         return $database;
     }
