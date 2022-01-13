@@ -1,0 +1,24 @@
+{
+    "name": "balsama/boston-plate-lookup",
+    "description": "Lookup City of Boston tickets by plate number",
+    "type": "project",
+    "require": {
+        "php": "^8",
+        "catfan/medoo": "^2.1",
+        "guzzlehttp/guzzle": "^7.4"
+    },
+    "license": "gpl-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Balsama\\BostonPlateLookup\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Adam Balsam",
+            "email": "balsam.adam@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
