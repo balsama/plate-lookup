@@ -5,7 +5,8 @@
     "require": {
         "php": "^8",
         "catfan/medoo": "^2.1",
-        "guzzlehttp/guzzle": "^7.4"
+        "guzzlehttp/guzzle": "^7.4",
+        "ramsey/uuid": "^4.2"
     },
     "license": "gpl-2.0-or-later",
     "autoload": {

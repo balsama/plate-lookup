@@ -2,8 +2,11 @@
 
 include_once('vendor/autoload.php');
 
-use Balsama\BostonPlateLookup\Lookup;
 use Balsama\BostonPlateLookup\Helpers;
+use Ramsey\Uuid\Uuid;
+
+set_time_limit(0);
+ob_start();
 
 if (!$_POST) {
     echo '200 ok<p>POST a <code>plate_number</code> value to look up tickets.</p>';
@@ -17,70 +20,15 @@ if (strlen($plateNumber) > 10) {
     throw new Exception('Plate number cannot be longer than ten characters');
 }
 
-$database = Helpers::initializeDatabase();
+$uuid = Uuid::uuid4();
+print 'Your custom endpoint is: ' . $uuid->toString() . '.txt';
 
-$existingRecord = $database->select('lookup', ['plate_number', 'fetched_timestamp'], [
-    'plate_number' => $plateNumber,
-    'ORDER' => ['fetched_timestamp' => 'DESC'],
-    'LIMIT' => 1,
-]);
+header('Connection: close');
+header('Content-Length: '.ob_get_length());
+ob_end_flush();
+ob_flush();
+flush();
 
-if (!$existingRecord) {
-    $lookup = new Lookup($plateNumber);
-    $lookup->saveToDb();
-}
-else {
-    $existingRecordTimestamp = reset($existingRecord)['fetched_timestamp'];
-    if ((time() - $existingRecordTimestamp) > 86400) {
+Helpers::processPlate($plateNumber, $uuid);
 
-        $existingRecordBirthday = $database->select(
-            'birthdays',
-            ['birth_month', 'birth_monthday'],
-            ['plate_number' => $plateNumber]
-        );
-
-        if (!$existingRecordBirthday) {
-            $lookup = new Lookup($plateNumber);
-        }
-        else {
-            $existingRecordBirthday = reset($existingRecordBirthday);
-            $yearDay = Helpers::getYearDayFromMonthAndMonthday(
-                $existingRecordBirthday['birth_month'],
-                $existingRecordBirthday['birth_monthday']
-            );
-            $lookup = new Lookup($plateNumber, 'PA', $yearDay);
-        }
-        $lookup->saveToDb();
-    }
-}
-
-$record = $database->select('lookup', '*', [
-    'plate_number' => $plateNumber,
-    'ORDER' => ['fetched_timestamp' => 'DESC'],
-    'LIMIT' => 1,
-]);
-$record = reset($record);
-
-$tickets = $database->select('tickets', '*', [
-    'plate_number' => $plateNumber,
-]);
-
-$message = '';
-if ($record['found']) {
-    $format = "Plate \"%s\" has a current balance of $%4.2f.\n";
-    $message = sprintf($format, strtoupper($plateNumber), $record['balance']);
-}
-else {
-    $format = "Unable to find plate \"%s\" in the system.\n";
-    $message = sprintf($format, strtoupper($plateNumber));
-}
-if ($tickets) {
-    $message .= "\n" . count($tickets) . " total Tickets found:\n";
-    foreach ($tickets as $ticket) {
-        /* @var \Balsama\BostonPlateLookup\Ticket $ticket */
-        $format = "• %s: $%4.2f - issued %s %s at %s.\n";
-        $message .= sprintf($format, $ticket['infraction'], $ticket['fine'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
-    }
-}
-
-print $message;
+die();

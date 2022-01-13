@@ -33,6 +33,5 @@ foreach ($data as $rawTicket) {
     if ($i % 1000) {
         print "Imported $i records ...\n";
     }
-
-    print "Imported all $i records. \n";
 }
+print "Imported all $i records. \n";
