@@ -10,7 +10,7 @@ class Helpers
     {
         if (getenv('LOOKUPENV') === 'dioc') {
             $database = new Medoo([
-                'type' => 'PostgreSQL',
+                'type' => 'postgresql',
                 'host' => 'app-42d2b891-6867-4baa-98c5-c4ba9a24675f-do-user-2963441-0.b.db.ondigitalocean.com',
                 'port' => 25060,
                 'database' => 'lookups.db',
