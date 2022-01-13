@@ -17,49 +17,85 @@ class Helpers
                 'username' => 'lookups',
                 'password' => getenv('DIOC_PG_PW'),
             ]);
+
+            $database->create('lookup', [
+                'id' => [
+                    'SERIAL',
+                    'PRIMARY KEY'
+                ],
+                'plate_number' => ['TEXT'],
+                'found' => ['INTEGER'],
+                'balance' => ['FLOAT'],
+                'full_response' => ['TEXT'],
+                'fetched_timestamp' => ['INTEGER'],
+            ]);
+
+            $database->create('tickets', [
+                'id' => [
+                    'SERIAL',
+                    'PRIMARY KEY',
+                ],
+                'ticket_number' => ['TEXT', 'UNIQUE'],
+                'plate_number' => ['TEXT'],
+                'infraction' => ['TEXT'],
+                'fine' => ['FLOAT'],
+                'infraction_date' => ['TEXT'],
+                'infraction_time' => ['TEXT'],
+                'infraction_address' => ['TEXT'],
+            ]);
+
+            $database->create('birthdays', [
+                'id' => [
+                    'SERIAL',
+                    'PRIMARY KEY'
+                ],
+                'plate_number' => ['TEXT'],
+                'birth_month' => ['INTEGER'],
+                'birth_monthday' => ['INTEGER'],
+            ]);
         }
         else {
             $database = new Medoo([
                 'type' => 'sqlite',
                 'database' => 'lookups.db'
             ]);
+
+            $database->create('lookup', [
+                'id' => [
+                    'INTEGER',
+                    'PRIMARY KEY'
+                ],
+                'plate_number' => ['TEXT'],
+                'found' => ['INTEGER'],
+                'balance' => ['FLOAT'],
+                'full_response' => ['TEXT'],
+                'fetched_timestamp' => ['INTEGER'],
+            ]);
+
+            $database->create('tickets', [
+                'id' => [
+                    'INTEGER',
+                    'PRIMARY KEY',
+                ],
+                'ticket_number' => ['TEXT', 'UNIQUE'],
+                'plate_number' => ['TEXT'],
+                'infraction' => ['TEXT'],
+                'fine' => ['FLOAT'],
+                'infraction_date' => ['TEXT'],
+                'infraction_time' => ['TEXT'],
+                'infraction_address' => ['TEXT'],
+            ]);
+
+            $database->create('birthdays', [
+                'id' => [
+                    'INTEGER',
+                    'PRIMARY KEY'
+                ],
+                'plate_number' => ['TEXT'],
+                'birth_month' => ['INTEGER'],
+                'birth_monthday' => ['INTEGER'],
+            ]);
         }
-
-        $database->create('lookup', [
-            'id' => [
-                'INTEGER',
-                'PRIMARY KEY'
-            ],
-            'plate_number' => ['TEXT'],
-            'found' => ['INTEGER'],
-            'balance' => ['FLOAT'],
-            'full_response' => ['TEXT'],
-            'fetched_timestamp' => ['INTEGER'],
-        ]);
-
-        $database->create('tickets', [
-            'id' => [
-                'INTEGER',
-                'PRIMARY KEY',
-            ],
-            'ticket_number' => ['TEXT', 'UNIQUE'],
-            'plate_number' => ['TEXT'],
-            'infraction' => ['TEXT'],
-            'fine' => ['FLOAT'],
-            'infraction_date' => ['TEXT'],
-            'infraction_time' => ['TEXT'],
-            'infraction_address' => ['TEXT'],
-        ]);
-
-        $database->create('birthdays', [
-            'id' => [
-                'INTEGER',
-                'PRIMARY KEY'
-            ],
-            'plate_number' => ['TEXT'],
-            'birth_month' => ['INTEGER'],
-            'birth_monthday' => ['INTEGER'],
-        ]);
 
         return $database;
     }
