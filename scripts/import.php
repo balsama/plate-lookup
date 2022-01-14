@@ -30,7 +30,7 @@ foreach ($data as $rawTicket) {
 
     SaveToDb::insertTicket($ticket);
     $i++;
-    if ($i % 1000) {
+    if ($i % 1000 == 0) {
         print "Imported $i records ...\n";
     }
 }
