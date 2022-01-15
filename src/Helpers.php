@@ -4,19 +4,31 @@ namespace Balsama\BostonPlateLookup;
 
 use Medoo\Medoo;
 use Ramsey\Uuid\Uuid;
+use PDO;
 
 class Helpers
 {
     public static function initializeDatabase(): Medoo
     {
-        if (getenv('LOOKUPENV') === 'dioc') {
+        if (file_exists(__DIR__ . '/../../connections/diocdb.json')) {
+            $connection = json_decode(file_get_contents(__DIR__ . '/../../connections/diocdb.json'));
+
+            $dsnVars = [
+                'dbname' => $connection->database,
+                'host' => $connection->host,
+                'sslmode' => 'require',
+                'port' => $connection->port,
+            ];
+
+            foreach($dsnVars as $id => $value) {
+                $pair[] = implode('=', [$id, $value]);
+            }
+            $dsn = 'pgsql:' . implode(';', $pair);
+
+            $pdo = new PDO($dsn, $connection->username, $connection->password);
             $database = new Medoo([
-                'type' => 'pgsql',
-                'host' => getenv('DIOC_PG_HOST'),
-                'port' => getenv('DIOC_PG_port'),
-                'database' => getenv('DIOC_PG_DB_NAME'),
-                'username' => getenv('DIOC_PG_DB_USERNAME'),
-                'password' => getenv('DIOC_PG_PW'),
+                'pdo' => $pdo,
+                'type' => 'pgsql'
             ]);
         }
         else {
