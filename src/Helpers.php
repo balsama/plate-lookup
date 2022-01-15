@@ -141,5 +141,7 @@ class Helpers
         }
 
         file_put_contents('results/' . $uuid . '.txt', $message);
+
+        return $message;
     }
 }
