@@ -135,7 +135,7 @@ class Helpers
             $message .= "\n" . count($tickets) . " total Tickets found:\n";
             foreach ($tickets as $ticket) {
                 /* @var \Balsama\BostonPlateLookup\Ticket $ticket */
-                $format = "• %s: $%4.2f - issued %s %s at %s.\n";
+                $format = " - %s: $%4.2f issued %s %s at %s.\n";
                 $message .= sprintf($format, $ticket['infraction'], $ticket['fine'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
             }
         }
