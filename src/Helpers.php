@@ -128,7 +128,7 @@ class Helpers
             $message = sprintf($format, strtoupper($plateNumber), $record['balance']);
         }
         else {
-            $format = "Unable to find plate \"%s\" in the system.\n";
+            $format = "Unable to find current balance for plate \"%s\" in the system.\n";
             $message = sprintf($format, strtoupper($plateNumber));
         }
         if ($tickets) {
