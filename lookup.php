@@ -18,7 +18,11 @@ if (strlen($plateNumber) > 10) {
 }
 
 $uuid = Uuid::uuid4();
-header('responseendpoint:' . $uuid->toString() . '.txt'); ;
+header('responseendpoint:' . $uuid->toString() . '.txt');
 
 $message = Helpers::processPlate($plateNumber, $uuid);
-print $message;
+
+$response = ['message' => $message];
+header('HTTP/1.1 201 Created');
+
+echo json_encode($response);
