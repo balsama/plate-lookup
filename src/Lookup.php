@@ -27,6 +27,12 @@ class Lookup
             $this->lookupParameters->incrementYearDay();
             return $this->process();
         }
+        elseif ((!$this->found) && ($this->lookupParameters->yearDay == 366) && ($this->lookupParameters->plateType == 'PA')) {
+            $this->lookupParameters->yearDay = 1;
+            $this->lookupParameters->plateType = 'CO';
+            return $this->process();
+        }
+
         // @todo Switch to commercial plates if not found.
         if ($this->found) {
             $balance = ResponseParser::getBalance($this->response);

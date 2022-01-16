@@ -140,8 +140,12 @@ class Helpers
             }
         }
 
+
         if (file_put_contents('results/' . $uuid . '.txt', $message)) {
-            return $message;
+            return [
+                'message' => $message,
+                'total_tickets' => count($tickets),
+            ];
         }
 
     }
