@@ -5,6 +5,7 @@ include_once('vendor/autoload.php');
 use Balsama\BostonPlateLookup\Ticket;
 use Balsama\BostonPlateLookup\SaveToDb;
 use Balsama\BostonPlateLookup\Helpers;
+use Balsama\BostonPlateLookup\PlateInfo;
 
 $csv = file('data/parking_tickets.csv');
 Helpers::initializeDatabase();
@@ -29,7 +30,7 @@ foreach ($data as $rawTicket) {
         (float) ltrim($rawTicket[14], '$'),
     );
 
-    $plateInfo = new \Balsama\BostonPlateLookup\PlateInfo($rawTicket[12]);
+    $plateInfo = new PlateInfo($rawTicket[12]);
     $plateInfo->setvVehicleMake($rawTicket[10]);
 
     SaveToDb::insertTicket($ticket, $plateInfo);
