@@ -20,6 +20,7 @@ $i = 0;
 foreach ($data as $rawTicket) {
     $ticket = new Ticket(
         strtolower($rawTicket[12]),
+        $rawTicket[11],
         $rawTicket[0],
         $rawTicket[1],
         $rawTicket[2],
@@ -28,7 +29,10 @@ foreach ($data as $rawTicket) {
         (float) ltrim($rawTicket[14], '$'),
     );
 
-    SaveToDb::insertTicket($ticket);
+    $plateInfo = new \Balsama\BostonPlateLookup\PlateInfo($rawTicket[12]);
+    $plateInfo->setvVehicleMake($rawTicket[10]);
+
+    SaveToDb::insertTicket($ticket, $plateInfo);
     $i++;
     if ($i % 1000 == 0) {
         print "Imported $i records ...\n";

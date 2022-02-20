@@ -23,7 +23,7 @@ if (!$existingRecord) {
     $lookup->saveToDb();
 } else {
     $existingRecordTimestamp = reset($existingRecord)['fetched_timestamp'];
-    if ((time() - $existingRecordTimestamp) > 86400) {
+    if ((time() - $existingRecordTimestamp) > 0) {
 
         $existingRecordBirthday = $database->select(
             'birthdays',

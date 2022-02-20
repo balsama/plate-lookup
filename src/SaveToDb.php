@@ -52,9 +52,12 @@ class SaveToDb
         }
     }
 
-    public static function insertTicket($ticket)
+    public static function insertTicket($ticket, PlateInfo $plateInfo)
     {
         $database = Helpers::initializeDatabase();
+
+        self::insertPlate($database, $ticket, $plateInfo);
+
         $existingRecord = $database->select('tickets', 'ticket_number', [
             'ticket_number' => $ticket->ticketNumber,
         ]);
@@ -77,12 +80,40 @@ class SaveToDb
         );
     }
 
+    public static function insertPlate(Medoo $database, Ticket $ticket, PlateInfo $plateInfo)
+    {
+        $existingRecord = $database->select('plates', ['plate_number', 'vehicle_make'], [
+            'plate_number' => $ticket->plateNumber,
+        ]);
+
+        if ($existingRecord) {
+            if ($plateInfo->getVehicleMake() == 'UKN') {
+                // There's already a record, and this record doesn't know the vehicle type, so exit.
+                return;
+            }
+            if ($existingRecord[0]['vehicle_make'] !== 'UKN') {
+                // There is already a vehicle make stored for this plate.
+                return;
+            }
+            $database->delete('plates', ['plate_number' => $ticket->plateNumber]);
+        }
+
+        $database->insert(
+            'plates',
+            [
+                'plate_number' => $ticket->plateNumber,
+                'plate_type' => $ticket->plateType,
+                'vehicle_make' => $plateInfo->getVehicleMake(),
+            ]
+        );
+    }
+
     public function insertTickets()
     {
         if ($tickets = $this->record->getTickets()) {
             /* @var Ticket[] $tickets */
             foreach ($tickets as $ticket) {
-                self::insertTicket($ticket);
+                self::insertTicket($ticket, $this->record);
             }
         }
     }

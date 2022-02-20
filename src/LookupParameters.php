@@ -29,4 +29,9 @@ class LookupParameters
         $dayOfMonth = date('d', $timestamp);
         return (string) $dayOfMonth;
     }
+
+    public function getPlateType(): string
+    {
+        return $this->plateType;
+    }
 }

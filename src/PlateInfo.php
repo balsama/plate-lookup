@@ -10,6 +10,8 @@ class PlateInfo
     private string $fullResponse;
     private float $balance;
     private array $tickets = [];
+    private string $plateType;
+    private string $vehicleMake;
 
     public function __construct(
         public string $plateNumber,
@@ -33,6 +35,14 @@ class PlateInfo
     public function setBalance(float $balance)
     {
         $this->balance = $balance;
+    }
+    public function setPlateType(string $type)
+    {
+        $this->plateType = $type;
+    }
+    public function setvVehicleMake(string $vehicleMake)
+    {
+        $this->vehicleMake = $vehicleMake;
     }
 
     public function addTicket(Ticket $ticket)
@@ -71,5 +81,13 @@ class PlateInfo
     public function getTickets()
     {
         return $this->tickets;
+    }
+    public function getPlateType()
+    {
+        return $this->plateType;
+    }
+    public function getVehicleMake()
+    {
+        return $this->vehicleMake;
     }
 }

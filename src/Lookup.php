@@ -37,14 +37,15 @@ class Lookup
         if ($this->found) {
             $balance = ResponseParser::getBalance($this->response);
             $this->plateInfo->setIsFound(true);
+            $this->plateInfo->setPlateType($this->lookupParameters->getPlateType());
+            $this->plateInfo->setvVehicleMake('UKN');
             $this->plateInfo->setBirthday($this->lookupParameters->getMonth(), $this->lookupParameters->getMonthDay());
             $this->plateInfo->setBalance($balance);
             $this->plateInfo->setFullResponse($this->response);
             if ($balance) {
                 /* @var Ticket[] $tickets */
-                $tickets = ResponseParser::getTickets($this->response);
+                $tickets = ResponseParser::getTickets($this->response, $this->plateInfo);
                 foreach ($tickets as $ticket) {
-                    $ticket->plateNumber = $this->plateInfo->getPlateNumber();
                     $this->plateInfo->addTicket($ticket);
                 }
             }
