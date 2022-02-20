@@ -94,7 +94,7 @@ class Helpers
         }
         else {
             $existingRecordTimestamp = reset($existingRecord)['fetched_timestamp'];
-            if ((time() - $existingRecordTimestamp) > 0) {
+            if ((time() - $existingRecordTimestamp) > 86400) {
 
                 $existingRecordBirthday = $database->select(
                     'birthdays',
