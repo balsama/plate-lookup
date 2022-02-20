@@ -62,6 +62,12 @@ class Helpers
             'birth_monthday' => ['INTEGER'],
         ]);
 
+        $database->create('plates', [
+            'plate_number' => ['TEXT'],
+            'plate_type' => ['TEXT'],
+            'vehicle_make' => ['TEXT'],
+        ]);
+
         return $database;
     }
 

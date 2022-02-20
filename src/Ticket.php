@@ -6,6 +6,7 @@ class Ticket
 {
     public function __construct(
         public string $plateNumber,
+        public string $plateType,
         public string $ticketNumber,
         public string $dateIssuedString,
         public string $timeIssuedString,

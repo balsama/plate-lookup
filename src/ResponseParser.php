@@ -35,7 +35,7 @@ class ResponseParser
         return (float) $balance;
     }
 
-    public static function getTickets($response)
+    public static function getTickets($response, PlateInfo $plateInfo)
     {
         $table = self::getStringBetween($response, 'Please select the items you wish to pay:</p>', '<br>');
 
@@ -60,7 +60,8 @@ class ResponseParser
 
             if (count($possibleTicket) === 7) {
                 $tickets[] = new Ticket(
-                    '',
+                    $plateInfo->getPlateNumber(),
+                    $plateInfo->getPlateType(),
                     $possibleTicket[1],
                     $possibleTicket[2],
                     $possibleTicket[3],
