@@ -40,6 +40,7 @@ class RequestPlate
                 'debug' => false
             ]);
         } catch (ServerException|GuzzleException $e) {
+            error_log($e);
             if ($retryOnError) {
                 $retryOnError--;
                 usleep(250000);
