@@ -13,9 +13,9 @@ class HelpersTest extends TestCase
         $notFounfPlateNumber = 'zzzzzz';
         $uuid = '123abc';
         $response = Helpers::processPlate($notFounfPlateNumber, $uuid);
-        $this->assertIsArray($response);
-        $this->assertTrue($response['found']);
-        $this->assertCount(5, $response);
+        $this->assertIsObject($response);
+        $this->assertTrue($response->found);
+        $this->assertObjectHasAttribute('vehicle_make', $response);
 
         $plateNumber = '3pr517';
         $uuid = '123abc';

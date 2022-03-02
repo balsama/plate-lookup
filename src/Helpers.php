@@ -150,32 +150,32 @@ class Helpers
         ]);
 
         $message = self::buildFormattedResponseMessage($record, $plateNumber, $tickets);
-        $response = self::buildResponseArray($record, $tickets, $existingRecordPlateInfo);
+        $response = self::buildResponseObject($record, $tickets, $existingRecordPlateInfo);
 
         file_put_contents(__DIR__ . '/../results/' . $uuid . '.txt', $message);
         return $response;
     }
 
-    private static function buildResponseArray($record, $tickets, $existingRecordPlateInfo): array
+    private static function buildResponseObject($record, $tickets, $existingRecordPlateInfo): \stdClass
     {
-        $response = [
-            'found' => false,
-            'tickets' => [],
-            'balance' => 0.00,
-            'plate_type' => '',
-            'vehicle_make' => '',
-        ];
+        $response = new \stdClass();
+        $response->found = false;
+        $response->tickets = [];
+        $response->balance = 0.0;
+        $response->plate_type = 'PA';
+        $response->vehicle_make = 'UNK';
+
 
         if ($record['found']) {
-            $response['found'] = true;
-            $response['balance'] = $record['balance'];
+            $response->found = true;
+            $response->balance = $record['balance'];
         }
         if ($tickets) {
-            $response['tickets'] = $tickets;
+            $response->tickets = $tickets;
         }
         if ($existingRecordPlateInfo) {
-            $response['plate_type'] = $existingRecordPlateInfo['plate_type'];
-            $response['vehicle_make'] = $existingRecordPlateInfo['vehicle_make'];
+            $response->plate_type = $existingRecordPlateInfo['plate_type'];
+            $response->vehicle_make = $existingRecordPlateInfo['vehicle_make'];
         }
 
         return $response;
