@@ -15,6 +15,10 @@ class ResponseParser
         if (str_contains($response, 'Plate Number not found')) {
             return false;
         }
+        if (!str_contains($response, '<!DOCTYPE html>')) {
+            // See GH Issue #3.
+            return false;
+        }
         return true;
     }
 
@@ -31,11 +35,11 @@ class ResponseParser
         else {
             $balance = self::getStringBetween($response, 'The Plate entered has a balance of ', '</li></ul>');
         }
-        $balance = ltrim($balance, '$');
+        $balance = rtrim(ltrim($balance, '$'));
         return (float) $balance;
     }
 
-    public static function getTickets($response, PlateInfo $plateInfo)
+    public static function getTickets(string $response, PlateInfo $plateInfo)
     {
         $table = self::getStringBetween($response, 'Please select the items you wish to pay:</p>', '<br>');
 

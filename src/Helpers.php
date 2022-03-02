@@ -2,6 +2,7 @@
 
 namespace Balsama\BostonPlateLookup;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Medoo\Medoo;
 use Ramsey\Uuid\Uuid;
 use PDO;
@@ -34,7 +35,7 @@ class Helpers
         else {
             $database = new Medoo([
                 'type' => 'sqlite',
-                'database' => 'lookups.db'
+                'database' => __DIR__ . '/../lookups.db'
             ]);
         }
 
@@ -82,14 +83,29 @@ class Helpers
     {
         $database = Helpers::initializeDatabase();
 
-        $existingRecord = $database->select('lookup', ['plate_number', 'fetched_timestamp'], [
-            'plate_number' => $plateNumber,
-            'ORDER' => ['fetched_timestamp' => 'DESC'],
-            'LIMIT' => 1,
-        ]);
+        $existingRecord = $database->select(
+            'lookup',
+            ['plate_number', 'fetched_timestamp'],
+            [
+                'plate_number' => $plateNumber,
+                'ORDER' => ['fetched_timestamp' => 'DESC'],
+                'LIMIT' => 1,
+            ]);
+
+        $existingRecordPlateInfo = $database->select(
+            'plates',
+            ['plate_number', 'plate_type', 'vehicle_make'],
+            ['plate_number' => $plateNumber]
+        );
+        $existingRecordPlateInfo = reset($existingRecordPlateInfo);
 
         if (!$existingRecord) {
-            $lookup = new Lookup($plateNumber);
+            if ($existingRecordPlateInfo) {
+                $lookup = new Lookup($plateNumber, $existingRecordPlateInfo['plate_type']);
+            }
+            else {
+                $lookup = new Lookup($plateNumber);
+            }
             $lookup->saveToDb();
         }
         else {
@@ -111,7 +127,12 @@ class Helpers
                         $existingRecordBirthday['birth_month'],
                         $existingRecordBirthday['birth_monthday']
                     );
-                    $lookup = new Lookup($plateNumber, 'PA', $yearDay);
+                    if ($existingRecordPlateInfo) {
+                        $lookup = new Lookup($plateNumber, $existingRecordPlateInfo['plate_type'], $yearDay);
+                    }
+                    else {
+                        $lookup = new Lookup($plateNumber, 'PA', $yearDay);
+                    }
                 }
                 $lookup->saveToDb();
             }
@@ -128,7 +149,39 @@ class Helpers
             'plate_number' => $plateNumber,
         ]);
 
-        $message = '';
+        $message = self::buildFormattedResponseMessage($record, $plateNumber, $tickets);
+        $response = self::buildResponseArray($record, $tickets, $existingRecordPlateInfo);
+
+        file_put_contents(__DIR__ . '/../results/' . $uuid . '.txt', $message);
+        return $response;
+    }
+
+    private static function buildResponseArray($record, $tickets, $existingRecordPlateInfo): array
+    {
+        $response = [
+            'found' => false,
+            'tickets' => [],
+            'balance' => 0.00,
+            'plate_type' => '',
+            'vehicle_make' => '',
+        ];
+
+        if ($record['found']) {
+            $response['found'] = true;
+            $response['balance'] = $record['balance'];
+        }
+        if ($tickets) {
+            $response['tickets'] = $tickets;
+        }
+        if ($existingRecordPlateInfo) {
+            $response['plate_type'] = $existingRecordPlateInfo['plate_type'];
+            $response['vehicle_make'] = $existingRecordPlateInfo['vehicle_make'];
+        }
+
+        return $response;
+    }
+    private static function buildFormattedResponseMessage($record, $plateNumber, $tickets = []): string
+    {
         if ($record['found']) {
             $format = "Plate \"%s\" has a current balance of $%4.2f.\n";
             $message = sprintf($format, strtoupper($plateNumber), $record['balance']);
@@ -145,14 +198,6 @@ class Helpers
                 $message .= sprintf($format, $ticket['infraction'], $ticket['fine'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
             }
         }
-
-
-        if (file_put_contents('results/' . $uuid . '.txt', $message)) {
-            return [
-                'message' => $message,
-                'total_tickets' => count($tickets),
-            ];
-        }
-
+        return $message;
     }
 }

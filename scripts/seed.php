@@ -5,8 +5,6 @@ include_once('vendor/autoload.php');
 use Balsama\BostonPlateLookup\Lookup;
 
 $plates =[
-    '1krk97',
-    '1wma43',
     '1mwl12',
     'y212',
     'evl273',
