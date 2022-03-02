@@ -38,7 +38,7 @@ class Lookup
             $balance = ResponseParser::getBalance($this->response);
             $this->plateInfo->setIsFound(true);
             $this->plateInfo->setPlateType($this->lookupParameters->getPlateType());
-            $this->plateInfo->setvVehicleMake('UKN');
+            $this->plateInfo->setVehicleMake('UKN');
             $this->plateInfo->setBirthday($this->lookupParameters->getMonth(), $this->lookupParameters->getMonthDay());
             $this->plateInfo->setBalance($balance);
             $this->plateInfo->setFullResponse($this->response);
@@ -49,6 +49,8 @@ class Lookup
                     $this->plateInfo->addTicket($ticket);
                 }
             }
+
+            return $this->plateInfo;
         }
     }
 

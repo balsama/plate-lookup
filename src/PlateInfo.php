@@ -40,7 +40,7 @@ class PlateInfo
     {
         $this->plateType = $type;
     }
-    public function setvVehicleMake(string $vehicleMake)
+    public function setVehicleMake(string $vehicleMake)
     {
         $this->vehicleMake = $vehicleMake;
     }

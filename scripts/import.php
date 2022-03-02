@@ -31,7 +31,7 @@ foreach ($data as $rawTicket) {
     );
 
     $plateInfo = new PlateInfo($rawTicket[12]);
-    $plateInfo->setvVehicleMake($rawTicket[10]);
+    $plateInfo->setVehicleMake($rawTicket[10]);
 
     SaveToDb::insertTicket($ticket, $plateInfo);
     $i++;
