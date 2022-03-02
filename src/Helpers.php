@@ -2,9 +2,7 @@
 
 namespace Balsama\BostonPlateLookup;
 
-use JetBrains\PhpStorm\ArrayShape;
 use Medoo\Medoo;
-use Ramsey\Uuid\Uuid;
 use PDO;
 
 class Helpers
