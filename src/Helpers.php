@@ -159,6 +159,7 @@ class Helpers
     private static function buildResponseObject($record, $tickets, $existingRecordPlateInfo): \stdClass
     {
         $response = new \stdClass();
+        $response->plate_number = $record['plate_number'];
         $response->found = false;
         $response->tickets = [];
         $response->balance = 0.0;
