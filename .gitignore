@@ -5,3 +5,4 @@ data/
 lookups.db*
 results/
 .phpunit.result.cache
+/backups

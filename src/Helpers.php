@@ -7,7 +7,7 @@ use PDO;
 
 class Helpers
 {
-    public static function initializeDatabase(): Medoo
+    public static function initializeDatabase($sqliteDb = __DIR__ . '/../lookups.db'): Medoo
     {
         if (file_exists(__DIR__ . '/../../connections/diocdb.json')) {
             $connection = json_decode(file_get_contents(__DIR__ . '/../../connections/diocdb.json'));
@@ -33,7 +33,7 @@ class Helpers
         else {
             $database = new Medoo([
                 'type' => 'sqlite',
-                'database' => __DIR__ . '/../lookups.db'
+                'database' => $sqliteDb,
             ]);
         }
 
