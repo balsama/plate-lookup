@@ -25,7 +25,7 @@ class SaveToDb
     public function insertBirthday()
     {
         if ($this->record->getIsFound()) {
-            $existingRecord = $this->database->select('birthdays', 'plate_number', [
+            $existingRecord = $this->database->get('birthdays', 'plate_number', [
                 'plate_number' => $this->record->getPlateNumber(),
             ]);
             if ($existingRecord) {
@@ -58,7 +58,7 @@ class SaveToDb
 
         self::insertPlate($database, $ticket, $plateInfo);
 
-        $existingRecord = $database->select('tickets', 'ticket_number', [
+        $existingRecord = $database->get('tickets', 'ticket_number', [
             'ticket_number' => $ticket->ticketNumber,
         ]);
 
@@ -80,9 +80,29 @@ class SaveToDb
         );
     }
 
+    public static function insertKnownUniqueTicket($ticket, PlateInfo $plateInfo)
+    {
+        $database = Helpers::initializeDatabase();
+
+        self::insertKnownUniquePlate($database, $ticket, $plateInfo);
+
+        $database->insert(
+            'tickets',
+            [
+                'ticket_number' => $ticket->ticketNumber,
+                'plate_number' => $ticket->plateNumber,
+                'infraction' => $ticket->reason,
+                'fine' => $ticket->amount,
+                'infraction_date' => $ticket->dateIssuedString,
+                'infraction_time' => $ticket->timeIssuedString,
+                'infraction_address' => $ticket->address,
+            ]
+        );
+    }
+
     public static function insertPlate(Medoo $database, Ticket $ticket, PlateInfo $plateInfo)
     {
-        $existingRecord = $database->select('plates', ['plate_number', 'vehicle_make'], [
+        $existingRecord = $database->get('plates', ['plate_number', 'vehicle_make'], [
             'plate_number' => $ticket->plateNumber,
         ]);
 
@@ -91,13 +111,25 @@ class SaveToDb
                 // There's already a record, and this record doesn't know the vehicle type, so exit.
                 return;
             }
-            if ($existingRecord[0]['vehicle_make'] !== 'UKN') {
+            if ($existingRecord['vehicle_make'] !== 'UKN') {
                 // There is already a vehicle make stored for this plate.
                 return;
             }
             $database->delete('plates', ['plate_number' => $ticket->plateNumber]);
         }
 
+        $database->insert(
+            'plates',
+            [
+                'plate_number' => $ticket->plateNumber,
+                'plate_type' => $ticket->plateType,
+                'vehicle_make' => $plateInfo->getVehicleMake(),
+            ]
+        );
+    }
+
+    public static function insertKnownUniquePlate(Medoo $database, Ticket $ticket, PlateInfo $plateInfo)
+    {
         $database->insert(
             'plates',
             [

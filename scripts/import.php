@@ -7,36 +7,39 @@ use Balsama\BostonPlateLookup\SaveToDb;
 use Balsama\BostonPlateLookup\Helpers;
 use Balsama\BostonPlateLookup\PlateInfo;
 
-$csv = file('data/parking_tickets.csv');
-Helpers::initializeDatabase();
+$importDirectory = __DIR__ . '/../data/2023/';
+$importFiles = array_diff(scandir($importDirectory), ['..', '.']);
 
-$data = [];
-foreach ($csv as $line) {
-    $data[] = str_getcsv($line);
-}
+foreach ($importFiles as $file) {
 
-array_shift($data);
+    print date("G:i:s", time()) . " Starting file $file.\n";
+    $csv = file($importDirectory . $file);
+    Helpers::initializeDatabase();
 
-$i = 0;
-foreach ($data as $rawTicket) {
-    $ticket = new Ticket(
-        strtolower($rawTicket[12]),
-        $rawTicket[11],
-        $rawTicket[0],
-        $rawTicket[1],
-        $rawTicket[2],
-        $rawTicket[4],
-        $rawTicket[6],
-        (float) ltrim($rawTicket[14], '$'),
-    );
+    $i = 0;
+    foreach ($csv as $line) {
+        $rawTicket = str_getcsv($line);
 
-    $plateInfo = new PlateInfo($rawTicket[12]);
-    $plateInfo->setVehicleMake($rawTicket[10]);
+        $ticket = new Ticket(
+            strtolower($rawTicket[14]), // Plate number
+            $rawTicket[12], // Plate type
+            $rawTicket[0], // Ticket Number
+            $rawTicket[1], // Date issued
+            $rawTicket[2], // Time issued
+            $rawTicket[5], // Reason
+            $rawTicket[7], // Address
+            (float)ltrim($rawTicket[15], '$'), // Amount
+        );
 
-    SaveToDb::insertTicket($ticket, $plateInfo);
-    $i++;
-    if ($i % 1000 == 0) {
-        print "Imported $i records ...\n";
+        $plateInfo = new PlateInfo($rawTicket[14]);
+        $plateInfo->setVehicleMake($rawTicket[11]);
+
+        SaveToDb::insertKnownUniqueTicket($ticket, $plateInfo);
+        $i++;
+        if ($i % 1000 == 0) {
+            print date("G:i:s", time()) . " Imported $i records ...\n";
+        }
     }
+    unset($csv);
+    print date("G:i:s", time()) . " Imported all $i records from $file.\n";
 }
-print "Imported all $i records. \n";
